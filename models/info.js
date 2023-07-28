@@ -44,10 +44,10 @@ const infoSchema = new mongoose.Schema({
 
 infoSchema.methods.generateAuthToken = async function() {
     try {
-    const token = jwt.sign({_id:this._id}, process.env.SECRET_KEY);
+    const token = jwt.sign({_id:this._id, iat: Math.floor(Date.now() / 1000) + (60 * 60 * 24)}, process.env.SECRET_KEY);
     this.tokens = this.tokens.concat({token:token});
     await this.save();
-    console.log("tokenid>>>>" + token);
+    // console.log("tokenid>>>>" + token);
      return token;
     }catch(error){
      res.send("the error part" + error);
