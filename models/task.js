@@ -14,8 +14,10 @@ const TaskSchema = new mongoose.Schema({
         maxlenght: [20, 'name can not be more then 20 characters'],
     },
     status: {
-        type: Boolean,
-        default: false,
+        type: String,
+        enum: ['completed', 'process', 'panding'],
+        default: 'panding', // You can set a default value if needed
+        required: true, // You can also make the status field required
     },
 
 });

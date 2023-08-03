@@ -43,18 +43,18 @@ app.post("/users", async (req, res) => {
 
 ///////////* Auth Task *///////////
 
-const authTask = (req, res, next) =>{
+const authTask = async (req, res, next) =>{
   try {
     const token = req.cookies;
     const tokenKey = token.jwt;
    
     if(tokenKey){
-
       const verifyUser = jwt.verify(tokenKey, process.env.SECRET_KEY );
-    
       if(verifyUser){
-
+     
         if(verifyUser.iat * 1000 > Date.now()){
+          const user = await Info.findOne({_id : verifyUser._id}).select(['-password','-tokens'])
+          req.user = user;
           return next()
         }else{
           return res.status(401).json({
@@ -82,17 +82,30 @@ const authTask = (req, res, next) =>{
     }
 }
 
+///////////* User Task *///////////
+app.get("/usertask", authTask, async (req, res) => {
+ const userId = req.user.id
+  try{
+    const userTask = await Task.find({ owner: userId });
+    res.json(userTask);
+  }catch(error){
+    res.send(error);
+  }
+});
+
+
 ///////////* Create Task *///////////
 
 app.post("/tasks", authTask, async (req, res) => {
   // console.log(`this is a cookie >>>> ${req.cookies.jwt}`);
-    // console.log("authCookie>>>", authCookie);
+  // console.log("authCookie>>>", authCookie);
+  // console.log(req.user, 'User>>>');
   try {
     const nameSchema = new Task(req.body);
     const taskData = await nameSchema.save();
-    console.log('send', taskData)
+    console.log("taskData>>>>", taskData);
     return res.status(201).send(taskData);
-  } catch (error) {
+  } catch (error) { 
     return res.send(error);
     // console.log(error);
   }
@@ -119,7 +132,7 @@ app.get("/tasks/:id", async (req, res) => {
     // console.log("Task ID >>>> ", task_id);
     const findTask = await Task.findOne({ _id: task_id });
     res.send(findTask);
-    // console.log("updataTask >>>> ", findTask);
+    // console.log("updataTask >>>> ", .);
   } catch (error) {
     res.send(error);
     // console.log(error);
@@ -128,19 +141,29 @@ app.get("/tasks/:id", async (req, res) => {
 
 ///////////* Update Task *///////////
 
-app.patch("/tasks/:id", async (req, res) => {
+app.patch("/tasks/:id", authTask, async (req, res) => {
   try {
     const update_id = req.params.id;
     const update_name = req.params.name;
-
-    console.log(update_id,);
     const updateTask = await Task.findByIdAndUpdate(update_id,{name:req.body.name},{new:true});
-    console.log("Data Updated Successfuly>>>",updateTask);
     res.send(updateTask);
   } catch (error) {
     res.send(error);
     console.log(error);
   }
+});
+
+///////////* Delete Task *///////////
+
+app.delete("/tasks/:id", authTask, async (req, res) => {
+    try{
+      const task_id = req.params.id
+      const deleteTask = await Task.findByIdAndDelete({_id: task_id})
+      res.send(deleteTask);
+    }catch(err){
+      res.send(err);
+      console.log(err);
+    }
 });
 
 
@@ -152,15 +175,9 @@ app.post("/login", async (req, res) => {
     const password = req.body.password;
     const logindata = await Info.findOne({ email: email });
 
-    console.log(logindata,'data')
-
     const isMatch = await bcrypt.compare(password, logindata.password);
-    console.log(isMatch, 'isMatch')
-
     const token = await logindata.generateAuthToken();
-    console.log(token, 'token')
     let multiple = [{ email: email, tokenKey: token }];
-    console.log("token_id>>>>>>>", multiple);
     res.cookie("jwt", token, {
       expires: new Date(Date.now() + 600000),
       httpOnly: true,
