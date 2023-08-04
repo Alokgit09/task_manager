@@ -43,56 +43,72 @@ app.post("/users", async (req, res) => {
 
 ///////////* Auth Task *///////////
 
-const authTask = async (req, res, next) =>{
+const authTask = async (req, res, next) => {
   try {
     const token = req.cookies;
     const tokenKey = token.jwt;
-   
-    if(tokenKey){
-      const verifyUser = jwt.verify(tokenKey, process.env.SECRET_KEY );
-      if(verifyUser){
-     
-        if(verifyUser.iat * 1000 > Date.now()){
-          const user = await Info.findOne({_id : verifyUser._id}).select(['-password','-tokens'])
+
+    if (tokenKey) {
+      const verifyUser = jwt.verify(tokenKey, process.env.SECRET_KEY);
+      if (verifyUser) {
+        if (verifyUser.iat * 1000 > Date.now()) {
+          const user = await Info.findOne({ _id: verifyUser._id }).select([
+            "-password",
+            "-tokens",
+          ]);
           req.user = user;
-          return next()
-        }else{
+          return next();
+        } else {
           return res.status(401).json({
             success: false,
-            message: 'Token is expired'
+            message: "Token is expired",
           });
         }
-    
-      }else{
-      return res.status(401).json({
-        success: false,
-        message: 'Unthorized access'
+      } else {
+        return res.status(401).json({
+          success: false,
+          message: "Unthorized access",
         });
-    }
-
-    }else{
+      }
+    } else {
       return res.status(401).json({
         success: false,
-        message: 'Unthorized access'
+        message: "Unthorized access",
       });
     }
-    }catch(error){
+  } catch (error) {
     res.send(error);
     console.log("AuthTask Error >>>> ", error);
-    }
-}
+  }
+};
+
+///////////* User Task Status *///////////
+app.get("/taskstatus", authTask, async (req, res) => { 
+  try{
+    const nameSchema = new Task(req.body.status);
+    const status = nameSchema.status
+    console.log("status>>>>>", status);
+    const token = req.cookies;
+      const tokenKey = token.jwt;
+      console.log("tokenKey>>>>>", tokenKey);
+    // res.send(tokenKey);
+    res.send(status);
+  }catch(err){
+    res.send(err);
+  }
+  
+});
 
 ///////////* User Task *///////////
 app.get("/usertask", authTask, async (req, res) => {
- const userId = req.user.id
-  try{
+  const userId = req.user.id;
+  try {
     const userTask = await Task.find({ owner: userId });
     res.json(userTask);
-  }catch(error){
+  } catch (error) {
     res.send(error);
   }
 });
-
 
 ///////////* Create Task *///////////
 
@@ -105,7 +121,7 @@ app.post("/tasks", authTask, async (req, res) => {
     const taskData = await nameSchema.save();
     console.log("taskData>>>>", taskData);
     return res.status(201).send(taskData);
-  } catch (error) { 
+  } catch (error) {
     return res.send(error);
     // console.log(error);
   }
@@ -145,7 +161,11 @@ app.patch("/tasks/:id", authTask, async (req, res) => {
   try {
     const update_id = req.params.id;
     const update_name = req.params.name;
-    const updateTask = await Task.findByIdAndUpdate(update_id,{name:req.body.name},{new:true});
+    const updateTask = await Task.findByIdAndUpdate(
+      update_id,
+      { name: req.body.name },
+      { new: true }
+    );
     res.send(updateTask);
   } catch (error) {
     res.send(error);
@@ -156,16 +176,15 @@ app.patch("/tasks/:id", authTask, async (req, res) => {
 ///////////* Delete Task *///////////
 
 app.delete("/tasks/:id", authTask, async (req, res) => {
-    try{
-      const task_id = req.params.id
-      const deleteTask = await Task.findByIdAndDelete({_id: task_id})
-      res.send(deleteTask);
-    }catch(err){
-      res.send(err);
-      console.log(err);
-    }
+  try {
+    const task_id = req.params.id;
+    const deleteTask = await Task.findByIdAndDelete({ _id: task_id });
+    res.send(deleteTask);
+  } catch (err) {
+    res.send(err);
+    console.log(err);
+  }
 });
-
 
 ///////////* User Login *///////////
 
@@ -193,6 +212,9 @@ app.post("/login", async (req, res) => {
     res.send({ message: "Invalid login Details" });
   }
 });
+
+
+///////////* Get All User Data *///////////
 
 app.get("/users", async (req, res) => {
   try {
