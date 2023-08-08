@@ -83,16 +83,23 @@ const authTask = async (req, res, next) => {
 };
 
 ///////////* User Task Status *///////////
-app.get("/taskstatus", authTask, async (req, res) => { 
+app.post("/taskstatus", authTask, async (req, res) => { 
   try{
-    const nameSchema = new Task(req.body.status);
-    const status = nameSchema.status
-    console.log("status>>>>>", status);
     const token = req.cookies;
-      const tokenKey = token.jwt;
-      console.log("tokenKey>>>>>", tokenKey);
-    // res.send(tokenKey);
-    res.send(status);
+    const tokenKey = token.jwt;
+    if (tokenKey) {
+      const verifyUser = jwt.verify(tokenKey, process.env.SECRET_KEY);
+      if(verifyUser.iat * 1000 > Date.now()){
+      const status = new Task(req.body);
+      const statusData = await status.save();
+      res.status(201).send(statusData);
+      console.log("POST Status >> ", statusData);
+      }else{
+        console.log("Invalid Token Id >> ");
+      }
+    }else{
+      console.log("Unthorized access 2");
+    }
   }catch(err){
     res.send(err);
   }
