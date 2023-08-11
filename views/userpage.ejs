@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>User Tasks</title>
+
+<style>
+  .container table.table {
+    width: 800px;
+    padding: 40px;
+    border: 1px solid lightgray;
+}
+
+.container table.table thead {
+    background-color: #1CB27B;
+    color: white;
+}
+.container thead tr th {
+    text-align: center;
+    font-family: monospace;
+    font-size: 22px;
+    padding: 10px;
+}
+.container .table tbody#data tr {
+    background-color: #F55549;
+    color: white;
+}
+.container .table tbody#data tr td {
+    padding: 7px;
+    font-size: 18px;
+    font-weight: 500;
+    font-family: sans-serif;
+    text-transform: capitalize;
+}
+center h2 {
+    font-family: sans-serif;
+    font-size: 30px;
+    padding: 10px 0px;
+    color: darkcyan;
+}
+</style>
+
+  </head>
+  <body>
+<center>
+<h2> This Task Page All of User</h2>
+
+<div class="container">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Owner</th>
+      </tr>
+    </thead>
+    <tbody id="data">
+
+    </tbody>
+  </table>
+</div>
+
+</center>
+
+<script>
+fetch("http://localhost:4000/usertask/")
+.then(response => response.json())
+.then(data => {
+   let allData = data
+  console.log("All Data >>>", allData);
+  if(allData.length > 0) {
+  var temp = "";
+  var index = 0;
+  allData.forEach((itemData, index) => {
+    temp += "<tr>";
+    temp += "<td>" +(index+1) + "</td>";
+    temp += "<td>" + itemData.name + "</td>";
+    temp += "<td>" + itemData.status + "</td>";
+    temp += "<td>" + itemData.owner + "</td>"; 
+      temp += "</tr>";  
+     console.log("Temp>>>", temp);   
+  });
+  document.getElementById('data').innerHTML = temp;
+  }
+}).catch(error => console.log(error));    
+
+
+
+
+
+
+</script>
+  </body> 
+</html>

@@ -11,8 +11,31 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const port = process.env.PORT || 4000;
 
+app.set("view engine", "ejs");
 app.use(cookieParser());
 app.use(express.json());
+
+
+///////////* All Pages Routes *///////////
+
+app.get("/", (req, res) => {
+ res.render("login");
+});
+app.get("/singup", (req, res) => {
+  res.render("singup");
+ });
+ app.get("/login", (req, res) => {
+  res.render("login");
+ }); 
+ app.get("/home", (req, res) => {
+  res.render("home");
+ });
+ app.get("/userpage", (req, res) => {
+  res.render("userpage");
+ });
+
+
+///////////* Create Users *///////////
 
 app.post("/users", async (req, res) => {
   try {
@@ -203,7 +226,7 @@ app.post("/login", async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, logindata.password);
     const token = await logindata.generateAuthToken();
-    let multiple = [{ email: email, tokenKey: token }];
+    let multiple = { email: email, tokenKey: token };
     res.cookie("jwt", token, {
       expires: new Date(Date.now() + 600000),
       httpOnly: true,
