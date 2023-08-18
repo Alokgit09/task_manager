@@ -106,23 +106,31 @@ const authTask = async (req, res, next) => {
 };
 
 ///////////* User Task Status *///////////
-app.post("/taskstatus", authTask, async (req, res) => { 
+app.put("/taskstatus/:id", authTask, async (req, res) => { 
   try{
-    const token = req.cookies;
-    const tokenKey = token.jwt;
-    if (tokenKey) {
-      const verifyUser = jwt.verify(tokenKey, process.env.SECRET_KEY);
-      if(verifyUser.iat * 1000 > Date.now()){
-      const status = new Task(req.body);
-      const statusData = await status.save();
-      res.status(201).send(statusData);
-      console.log("POST Status >> ", statusData);
-      }else{
-        console.log("Invalid Token Id >> ");
-      }
-    }else{
-      console.log("Unthorized access 2");
-    }
+    const task = await Task.findById(req.params.id);
+    let status= task.status==="panding"?"process":"completed"
+    await Task.findByIdAndUpdate(
+      req.params.id,
+      {status}
+    )
+    task.status=status;
+    return res.sendStatus(200);
+    // const token = req.cookies;
+    // const tokenKey = token.jwt;
+    // if (tokenKey) {
+    //   const verifyUser = jwt.verify(tokenKey, process.env.SECRET_KEY);
+    //   if(verifyUser.iat * 1000 > Date.now()){
+    //   const status = new Task(req.body);
+    //   const statusData = await status.save();
+    //   res.status(201).send(statusData);
+    //   console.log("POST Status >> ", statusData);
+    //   }else{
+    //     console.log("Invalid Token Id >> ");
+    //   }
+    // }else{
+    //   console.log("Unthorized access 2");
+    // }
   }catch(err){
     res.send(err);
   }
@@ -147,6 +155,7 @@ app.post("/tasks", authTask, async (req, res) => {
   // console.log("authCookie>>>", authCookie);
   // console.log(req.user, 'User>>>');
   try {
+    req.body.owner = req.user.id;
     const nameSchema = new Task(req.body);
     const taskData = await nameSchema.save();
     console.log("taskData>>>>", taskData);
