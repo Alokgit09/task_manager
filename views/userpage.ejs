@@ -8,7 +8,7 @@
 
     <style>
       .container table.table {
-        width: 900px;
+        width: 1000px;
         padding: 40px;
         border: 1px solid lightgray;
       }
@@ -40,6 +40,41 @@
         padding: 10px 0px;
         color: darkcyan;
       }
+      input#add_task {
+    height: 20px;
+    width: 600px;
+    border: 2px solid lightblue;
+    padding: 15px;
+    font-size: 16px;
+}
+button {
+    margin: 5px 10px;
+    font-size: 16px;
+    background-color: #000080;
+    font-weight: 500;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 15px;
+    border: navajowhite;
+}
+.popup_box {
+    width: 500px;
+    background-color: gainsboro;
+    border-radius: 20px;
+}
+input#update_field {
+    width: 300px;
+    height: 20px;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 10px;
+}
+.popup_box {
+    width: 500px;
+    background-color: gainsboro;
+    border-radius: 20px;
+    padding: 100px 20px;
+}
     </style>
   </head>
   <body>
@@ -51,6 +86,11 @@
           <div class="clearfix"></div>
         </form>
         <button onclick="addTask()" class="">Add Task</button>
+       
+      <div class="popup_box" style="display: none;">
+      <input id="update_field" type="text" />
+      <button class="update_btn">Update</button>
+      </div>  
 
         <div class="container">
           <table class="table">
@@ -60,6 +100,7 @@
                 <th>Name</th>
                 <th>Status</th>
                 <th>Owner</th>
+                <th>Update - Delete</th>
               </tr>
             </thead>
             <tbody id="data"></tbody>
@@ -69,29 +110,85 @@
     </center>
 
     <script>
+
+const popupBox = document.querySelector(".popup_box");
+const updBtn = document.querySelector(".update_btn");
+const updateField = document.querySelector("#update_field");
+
+
       fetch("http://localhost:4000/usertask/")
         .then((response) => response.json())
         .then((data) => {
           let allData = data;
-          console.log("All Data >>>", allData);
+          // console.log("All Data >>>", allData);
           if (allData.length > 0) {
             var temp = "";
             var index = 0;
             allData.forEach((itemData, index) => {
               temp += "<tr>";
               temp += "<td>" + (index + 1) + "</td>";
+              // temp += "<td>" + itemData._id + "</td>";
               temp += "<td>" + itemData.name + "</td>";
               temp += "<td>" + itemData.status + "</td>";
+              temp += "<td>" + itemData.owner + "</td>";
               temp +=
                 "<td>" +
-                itemData.owner +
-                "<button class='updateTask1' onclick="+updateTask(itemData._id)+">Update</button>" +
-                `<button class="deleteTask1" onclick="deleteTask()">Delete</button>` +
+                `<button class='update_task' data-id='${itemData._id}' data-name='${itemData.name}'>Update</button>` +
+                `<button class='delete_task' data-id='${itemData._id}'>Delete</button>` +
                 "</td>";
               temp += "</tr>";
-              console.log("Temp>>>", temp);
+              // console.log("Temp>>>", temp);
             });
             document.getElementById("data").innerHTML = temp;
+      
+        ////////Delete Task /////////
+
+            const deleteBtn = document.querySelectorAll(".delete_task");
+            deleteBtn.forEach((item) => {
+              item.addEventListener("click", (e) => {
+                const btnId = e.target.getAttribute("data-id");
+                const deleteTask = async () => {
+                  await fetch(`http://localhost:4000/tasks/${btnId}`, {
+                    method: "DELETE",
+                  }).then((res) => console.log(res.json()));
+                };
+                deleteTask();
+              });
+            });
+
+        
+          //////// Update Task /////////   
+
+            const updateBtn = document.querySelectorAll(".update_task");
+            updateBtn.forEach((item) => {
+              item.addEventListener("click", (e) => {
+                const Update_Id = e.target.getAttribute("data-id");
+                const updateName = e.target.getAttribute("data-name");
+                popupBox.style.display = "block";
+                updateField.value = updateName;
+
+                const updateTask = async () => {
+                  await fetch(`http://localhost:4000/tasks/${Update_Id}`, {
+                    method: "PATCH",
+                    headers: {
+                      "Content-type": "application/json; charset=UTF-8",
+                    },
+                    body: JSON.stringify({
+                      name: updateField.value
+                    }),
+                  }).then((res) => console.log(res.json()));
+                };
+
+
+                updBtn.addEventListener("click", () => {
+                  updateTask();
+                  popupBox.style.display = "none";
+                })
+
+                
+
+              });
+            });
           }
         })
         .catch((error) => console.log(error));
@@ -114,23 +211,7 @@
           .catch((err) => console.error(err));
       };
 
-      //Update Taskk////
-
-      const updateTask = async (id) => {
-        console.log(id)
-        await fetch(`http://localhost:4000/taskstatus/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-        }).then(res=>console.log(res.json()));
-      };
-
-
-   const deleteTask = async () => {
-    console.log("ALOK>>>>>>>>>>>");
-   }
-
+   
     </script>
   </body>
 </html>
