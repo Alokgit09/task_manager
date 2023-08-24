@@ -15,25 +15,23 @@ app.set("view engine", "ejs");
 app.use(cookieParser());
 app.use(express.json());
 
-
 ///////////* All Pages Routes *///////////
 
 app.get("/", (req, res) => {
- res.render("login");
+  res.render("login");
 });
 app.get("/singup", (req, res) => {
   res.render("singup");
- });
- app.get("/login", (req, res) => {
+});
+app.get("/login", (req, res) => {
   res.render("login");
- }); 
- app.get("/home", (req, res) => {
+});
+app.get("/home", (req, res) => {
   res.render("home");
- });
- app.get("/userpage", (req, res) => {
+});
+app.get("/userpage", (req, res) => {
   res.render("userpage");
- });
-
+});
 
 ///////////* Create Users *///////////
 
@@ -106,15 +104,12 @@ const authTask = async (req, res, next) => {
 };
 
 ///////////* User Task Status *///////////
-app.put("/taskstatus/:id", authTask, async (req, res) => { 
-  try{
+app.put("/taskstatus/:id", authTask, async (req, res) => {
+  try {
     const task = await Task.findById(req.params.id);
-    let status= task.status==="panding"?"process":"completed"
-    await Task.findByIdAndUpdate(
-      req.params.id,
-      {status}
-    )
-    task.status=status;
+    let status = task.status === "panding" ? "process" : "completed";
+    await Task.findByIdAndUpdate(req.params.id, { status });
+    task.status = status;
     return res.sendStatus(200);
     // const token = req.cookies;
     // const tokenKey = token.jwt;
@@ -131,10 +126,9 @@ app.put("/taskstatus/:id", authTask, async (req, res) => {
     // }else{
     //   console.log("Unthorized access 2");
     // }
-  }catch(err){
+  } catch (err) {
     res.send(err);
   }
-  
 });
 
 ///////////* User Task *///////////
@@ -200,11 +194,10 @@ app.patch("/tasks/:id", authTask, async (req, res) => {
   try {
     const update_id = req.params.id;
     const update_name = req.params.name;
-    const updateTask = await Task.findByIdAndUpdate(
-      update_id,
-      { name: req.body.name },
-      { new: true }
-    );
+    const updateTask = await Task.findByIdAndUpdate(update_id, {
+      name: req.body.name,
+      status: req.body.status,
+    });
     res.send(updateTask);
   } catch (error) {
     res.send(error);
@@ -251,7 +244,6 @@ app.post("/login", async (req, res) => {
     res.send({ message: "Invalid login Details" });
   }
 });
-
 
 ///////////* Get All User Data *///////////
 

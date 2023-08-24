@@ -14,8 +14,8 @@
       }
 
       .container table.table thead {
-        background-color: #1cb27b;
-        color: white;
+        background-color: #f0f1f1;
+        color: #008b8b;
       }
       .container thead tr th {
         text-align: center;
@@ -24,8 +24,9 @@
         padding: 10px;
       }
       .container .table tbody#data tr {
-        background-color: #f55549;
-        color: white;
+        background-color: #e8f0fe;
+        color: black;
+        text-align: center;
       }
       .container .table tbody#data tr td {
         padding: 7px;
@@ -39,59 +40,126 @@
         font-size: 30px;
         padding: 10px 0px;
         color: darkcyan;
+        margin-top: 50px;
       }
       input#add_task {
-    height: 20px;
-    width: 600px;
-    border: 2px solid lightblue;
-    padding: 15px;
-    font-size: 16px;
-}
-button {
-    margin: 5px 10px;
-    font-size: 16px;
-    background-color: #000080;
-    font-weight: 500;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 15px;
-    border: navajowhite;
-}
-.popup_box {
-    width: 500px;
-    background-color: gainsboro;
-    border-radius: 20px;
-}
-input#update_field {
-    width: 300px;
-    height: 20px;
-    font-size: 16px;
-    padding: 10px;
-    border-radius: 10px;
-}
-.popup_box {
-    width: 500px;
-    background-color: gainsboro;
-    border-radius: 20px;
-    padding: 100px 20px;
-}
+        height: 20px;
+        width: 500px;
+        border: 2px solid lightblue;
+        padding: 15px;
+        font-size: 16px;
+        border-radius: 10px;
+      }
+      button.update_task {
+        margin: 5px 10px;
+        font-size: 16px;
+        background-color: #1cb27b;
+        font-weight: 500;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 15px;
+        border: navajowhite;
+      }
+      button.update_btn {
+        margin: 5px 10px;
+        font-size: 16px;
+        background-color: #1cb27b;
+        font-weight: 500;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 15px;
+        border: navajowhite;
+      }
+      button.delete_task {
+        margin: 5px 10px;
+        font-size: 16px;
+        background-color: #f55549;
+        font-weight: 500;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 15px;
+        border: navajowhite;
+      }
+      button.addTask {
+        margin: 20px 10px;
+        font-size: 18px;
+        background-color: #000080;
+        font-weight: 600;
+        color: white;
+        padding: 15px 30px;
+        border-radius: 15px;
+        border: none;
+      }
+      input#update_field {
+        width: 300px;
+        height: 20px;
+        font-size: 16px;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 10px;
+      }
+      .popup_box {
+        width: 500px;
+        background-color: #f0f1f1;
+        border-radius: 20px;
+        padding: 40px 20px;
+        position: absolute;
+        left: 30%;
+      }
+      .popup_box label {
+        font-size: 22px;
+        font-weight: 600;
+        font-family: math;
+        margin: 0px;
+      }
+      select#status {
+        width: 320px;
+        /* height: 20px; */
+        font-size: 16px;
+        padding: 12px;
+        border: 2px solid;
+        margin: 10px 0px;
+        border-radius: 10px;
+      }
+      .dis_flex1 {
+        display: inline-flex;
+        align-items: center;
+        margin: 20px 0px;
+      }
+      .content_pop {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
     </style>
   </head>
   <body>
     <center>
-      <h2>This Task Page All of User</h2>
+      <h2>This is Tasks of User</h2>
       <div class="input_text1">
-        <form id="form">
-          <input type="text" placeholder="Add Task" id="add_task" />
-          <div class="clearfix"></div>
-        </form>
-        <button onclick="addTask()" class="">Add Task</button>
-       
-      <div class="popup_box" style="display: none;">
-      <input id="update_field" type="text" />
-      <button class="update_btn">Update</button>
-      </div>  
+        <div class="dis_flex1">
+          <form id="form">
+            <input type="text" placeholder="Add Task" id="add_task" />
+            <div class="clearfix"></div>
+          </form>
+          <button class="addTask" onclick="addTask()" class="">Add Task</button>
+        </div>
 
+        <div class="content_pop">
+          <div class="popup_box" style="display: none">
+            <label for="task">Task</label><br />
+            <input id="update_field" type="text" /><br />
+
+            <label for="status">Status</label><br />
+            <select id="status">
+              <option value="panding">Panding</option>
+              <option value="process">Process</option>
+              <option value="completed">Completed</option></select
+            ><br />
+
+            <button class="update_btn">Update</button>
+          </div>
+        </div>
         <div class="container">
           <table class="table">
             <thead>
@@ -110,11 +178,21 @@ input#update_field {
     </center>
 
     <script>
+      const statusValue = document.getElementById("status");
 
-const popupBox = document.querySelector(".popup_box");
-const updBtn = document.querySelector(".update_btn");
-const updateField = document.querySelector("#update_field");
+      console.log("status>>>>", statusValue.value);
 
+      // let selectOption;
+
+      // statusValue.addEventListener("change", function (event) {
+      //   return selectOption = event.target.value;
+      // })
+
+      // console.log(selectOption)
+
+      const popupBox = document.querySelector(".popup_box");
+      const updBtn = document.querySelector(".update_btn");
+      const updateField = document.querySelector("#update_field");
 
       fetch("http://localhost:4000/usertask/")
         .then((response) => response.json())
@@ -125,6 +203,7 @@ const updateField = document.querySelector("#update_field");
             var temp = "";
             var index = 0;
             allData.forEach((itemData, index) => {
+              console.log(itemData.status);
               temp += "<tr>";
               temp += "<td>" + (index + 1) + "</td>";
               // temp += "<td>" + itemData._id + "</td>";
@@ -140,8 +219,8 @@ const updateField = document.querySelector("#update_field");
               // console.log("Temp>>>", temp);
             });
             document.getElementById("data").innerHTML = temp;
-      
-        ////////Delete Task /////////
+
+            ////////Delete Task /////////
 
             const deleteBtn = document.querySelectorAll(".delete_task");
             deleteBtn.forEach((item) => {
@@ -156,8 +235,7 @@ const updateField = document.querySelector("#update_field");
               });
             });
 
-        
-          //////// Update Task /////////   
+            //////// Update Task /////////
 
             const updateBtn = document.querySelectorAll(".update_task");
             updateBtn.forEach((item) => {
@@ -168,25 +246,23 @@ const updateField = document.querySelector("#update_field");
                 updateField.value = updateName;
 
                 const updateTask = async () => {
+                  console.log("status>>>>", statusValue.value);
                   await fetch(`http://localhost:4000/tasks/${Update_Id}`, {
                     method: "PATCH",
                     headers: {
                       "Content-type": "application/json; charset=UTF-8",
                     },
                     body: JSON.stringify({
-                      name: updateField.value
+                      name: updateField.value,
+                      status: statusValue.value,
                     }),
                   }).then((res) => console.log(res.json()));
                 };
 
-
                 updBtn.addEventListener("click", () => {
                   updateTask();
                   popupBox.style.display = "none";
-                })
-
-                
-
+                });
               });
             });
           }
@@ -210,8 +286,6 @@ const updateField = document.querySelector("#update_field");
           .then((res) => console.log(res.json()))
           .catch((err) => console.error(err));
       };
-
-   
     </script>
   </body>
 </html>
